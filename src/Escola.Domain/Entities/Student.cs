@@ -13,10 +13,11 @@ namespace Enceja.Domain.Entities
         [Column("registration_number")]
         public int RegistrationNumber { get; set; }
 
-        [JsonIgnore]
         public ICollection<Grade> Grades { get; set; }
 
         [ForeignKey(nameof(ClassId))]
         public Class? Class { get; set; }
+
+        public ICollection<Subject> Subjects { get; set; }
     }
 }
