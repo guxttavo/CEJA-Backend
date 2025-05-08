@@ -70,7 +70,9 @@ namespace Enceja.API.Controllers
             {
                 return BadRequest();
             }
+
             student.Id = 0;
+
             await _studentService.AddAsync(student);
 
             return CreatedAtAction(nameof(GetById), new { id = student.Id }, student);

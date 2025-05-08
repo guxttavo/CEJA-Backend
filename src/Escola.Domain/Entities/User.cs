@@ -1,5 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+public enum RoleType
+{
+    Student = 1,
+    Teacher = 2,
+    Admin = 3,
+    PendingTeacher = 4
+}
 
 namespace Enceja.Domain.Entities
 {
@@ -12,7 +19,7 @@ namespace Enceja.Domain.Entities
 
         public string Name { get; set; }
 
-        public string Email { get; set; }
+        public string Email { get; set; } 
 
         public string Document { get; set; }
 
@@ -20,7 +27,7 @@ namespace Enceja.Domain.Entities
 
         public string Phone { get; set; }
 
-        public virtual string Address { get; set; }
+        public string Address { get; set; }
 
         public DateTime BornDate { get; set; }
 
@@ -28,5 +35,6 @@ namespace Enceja.Domain.Entities
 
         public DateTime? PasswordResetTokenExpiry { get; set; }
 
+        public RoleType Role { get; set; }
     }
 }
