@@ -3,6 +3,9 @@ using Enceja.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Enceja.Domain.Interfaces;
+using Enceja.Application.DTO.Entities.Teacher;
+using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace Enceja.API.Controllers
 {
@@ -11,10 +14,13 @@ namespace Enceja.API.Controllers
     public class TeacherController : ControllerBase
     {
         private readonly ITeacherService _teacherService;
+        private readonly IPasswordHasher<Teacher> _passwordHasher;
 
-        public TeacherController(ITeacherService teacherService)
+
+        public TeacherController(ITeacherService teacherService, IPasswordHasher<Teacher> passwordHasher)
         {
             _teacherService = teacherService;
+            _passwordHasher = passwordHasher;
         }
 
         [HttpGet]
@@ -34,14 +40,35 @@ namespace Enceja.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Teacher teacher)
+        public async Task<ActionResult> Post([FromBody] TeacherDTO dto)
         {
-            if (teacher == null)
+            if (dto == null)
                 return BadRequest();
 
-            await _teacherService.AddAsync(teacher);
-            return CreatedAtAction(nameof(GetById), new { id = teacher.Id }, teacher);
+            try
+            {
+                var teacher = new Teacher
+                {
+                    Avatar = dto.Avatar,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    Document = dto.Document,
+                    Phone = dto.Phone,
+                    Address = dto.Address,
+                    BornDate = dto.BornDate,
+                    RoleId = dto.RoleId,
+                    Password = _passwordHasher.HashPassword(null, dto.Password)
+                };
+
+                await _teacherService.AddAsync(teacher);
+                return CreatedAtAction(nameof(GetById), new { id = teacher.Id }, teacher);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] Teacher teacher)
@@ -52,6 +79,14 @@ namespace Enceja.API.Controllers
             await _teacherService.UpdateAsync(teacher);
             return NoContent();
         }
+
+        [HttpPut("AproveTeacher/{id}")]
+        public async Task<IActionResult> AproveTeacher(int id)
+        {
+            await _teacherService.ApproveTeacherAsync(id);
+            return Ok(); 
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
